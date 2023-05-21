@@ -1,66 +1,23 @@
-// Basic:
-// struct Cli {
-//     pattern: String,
-//     path: std::path::PathBuf,
-// }
+#![allow(unused)]               //This line allows for unused code in the program without the compiler giving a warning.
 
-// let pattern = std::env::args().nth(1).expect("no pattern given");
-// let path = std::env::args().nth(2).expect("no path given");
+use clap::Parser;               //This line imports the Parser trait from the clap crate.
 
-// let args = Cli {
-//     pattern : pattern,
-//     path: std::path::PathBuf::from(path),
-// };
+#[derive(Parser)]               //This line derives the Parser trait for the Cli struct
+struct Cli {                    //This line defines a new struct named Cli.
+    
+    pattern: String,            //This line defines a field named pattern of type String in the Cli struct.
+    path: std::path::PathBuf,   //This line defines a field named path of type std::path::PathBuf in the Cli struct.
+}                               //This line defines a field named path of type std::path::PathBuf in the Cli struct.
 
-// Parsing CLI arguments with Clap
-use clap::Parser;
-use std::io::{BufRead, BufReader};
-use std::fs::File;
+fn main() {                                 //This line defines the main function of the program.
+    let args = Cli::parse();                //This line creates an instance of the Cli struct and parses command line arguments using the derived implementation of the Parser trait.
+    let content = std::fs::                 //This line reads the contents of the file specified by the user into a string.
+        read_to_string(&args.path)
+        .expect("could not read file");
 
-/// Search for a pattern in a file and display the lines that contain it.
-#[derive(Parser)]
-struct Cli {
-    /// The pattern to look for
-    pattern: String,
-    /// The path to the file to read
-    path: std::path::PathBuf,
-}
-
-fn main() {
-    /* 
-    In the modified version, BufReader is used to read the file line 
-    by line efficiently. It wraps the file reader (File) and provides a 
-    buffered interface for reading. Each line is checked for the pattern, 
-    and if it matches, it's printed. The code also includes error 
-    handling for file opening and reading.
-    */
-    let args = Cli::parse();
-    // let file = File::open(&args.path).expect("could not open file");
-    // let reader = BufReader::new(file);
-
-    /*
-        Following is the read to string implementation
-     */
-    let content = std::fs::read_to_string(&args.path).expect("could not read file");
-
-    //read to string :
-    for line in content.lines() {
-        // println!("{}", line);
-        if line.contains(&args.pattern) {
-            println!("{}", line);
+    for line in content.lines() {           //This line iterates over each line in the file’s content.
+        if line.contains(&args.pattern) {   //This line checks if the current line contains the pattern specified by the user.
+            println!("{}", line);           //If it does, this line prints it to standard output.
         }
     }
-
-
-
-    //Buff reader :
-    // for line in reader.lines() {
-    //     if let Ok(line) = line{
-    //         if line.contains(&args.pattern) {
-    //             println!("{}", line);
-    //         }
-    //     }
-    // }
-
 }
-
