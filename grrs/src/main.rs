@@ -11,6 +11,11 @@ struct Cli {                    //This line defines a new struct named Cli.
 
 fn main() {                                 //This line defines the main function of the program.
     let args = Cli::parse();                //This line creates an instance of the Cli struct and parses command line arguments using the derived implementation of the Parser trait.
+    let result = std::fs::read_to_string("../test.txt");
+    match result {
+        Ok(content) => { println!("File content: \n-------START_OF_FILE-------\n{}\n-------END_OF_FILE-------", content); }
+        Err(error) => { println!("Oh noes: {}", error); }
+    }
     let content = std::fs::                 //This line reads the contents of the file specified by the user into a string.
         read_to_string(&args.path)
         .expect("could not read file");
