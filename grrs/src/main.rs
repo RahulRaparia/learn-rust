@@ -1,28 +1,32 @@
-#![allow(unused)]               //This line allows for unused code in the program without the compiler giving a warning.
+#![allow(unused)] //This line allows for unused code in the program without the compiler giving a warning.
 
-use clap::Parser;               //This line imports the Parser trait from the clap crate.
+use clap::Parser;
+use std::io::Read;
+use std::path::PathBuf;
 
-#[derive(Parser)]               //This line derives the Parser trait for the Cli struct
-struct Cli {                    //This line defines a new struct named Cli.
+#[derive(Parser)] //This line derives the Parser trait for the Cli struct
+struct Cli {
+    //This line defines a new struct named Cli.
+    pattern: String, //This line defines a field named pattern of type String in the Cli struct.
+    path: std::path::PathBuf, //This line defines a field named path of type std::path::PathBuf in the Cli struct.
+} //This line defines a field named path of type std::path::PathBuf in the Cli struct.
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    //This line defines the main function of the program.
+    let args = Cli::parse(); //This line creates an instance of the Cli struct and parses command line arguments using the derived implementation of the Parser trait.
+    //unwrap
+    // let content = std::fs::read_to_string(&args.path).unwrap(); //This line reads the file specified by the user and stores its content in the content variable.
+
+    //?
+    let content = std::fs::read_to_string("../test.txt")?;
     
-    pattern: String,            //This line defines a field named pattern of type String in the Cli struct.
-    path: std::path::PathBuf,   //This line defines a field named path of type std::path::PathBuf in the Cli struct.
-}                               //This line defines a field named path of type std::path::PathBuf in the Cli struct.
-
-fn main() {                                 //This line defines the main function of the program.
-    let args = Cli::parse();                //This line creates an instance of the Cli struct and parses command line arguments using the derived implementation of the Parser trait.
-    let result = std::fs::read_to_string("../test.txt");
-    match result {
-        Ok(content) => { println!("File content: \n-------START_OF_FILE-------\n{}\n-------END_OF_FILE-------", content); }
-        Err(error) => { println!("Oh noes: {}", error); }
-    }
-    let content = std::fs::                 //This line reads the contents of the file specified by the user into a string.
-        read_to_string(&args.path)
-        .expect("could not read file");
-
-    for line in content.lines() {           //This line iterates over each line in the file’s content.
-        if line.contains(&args.pattern) {   //This line checks if the current line contains the pattern specified by the user.
-            println!("{}", line);           //If it does, this line prints it to standard output.
+    println!("Pattern: \n{}\n", args.pattern);
+    for line in content.lines() {
+        //This line iterates over each line in the file’s content.
+        if line.contains(&args.pattern) {
+            //This line checks if the current line contains the pattern specified by the user.
+            println!("{}", line); //If it does, this line prints it to standard output.
         }
     }
+    Ok(())
 }
