@@ -11,15 +11,27 @@ struct Cli {
     path: std::path::PathBuf, //This line defines a field named path of type std::path::PathBuf in the Cli struct.
 } //This line defines a field named path of type std::path::PathBuf in the Cli struct.
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[derive(Debug)]    //This line derives the Debug trait for the CustomError struct.
+struct CustomError(String);     //This line defines a new struct named CustomError.
+
+fn main() -> Result<(), CustomError> {
     //This line defines the main function of the program.
     let args = Cli::parse(); //This line creates an instance of the Cli struct and parses command line arguments using the derived implementation of the Parser trait.
-    //unwrap
-    // let content = std::fs::read_to_string(&args.path).unwrap(); //This line reads the file specified by the user and stores its content in the content variable.
+                             //unwrap
+                             // let content = std::fs::read_to_string(&args.path).unwrap(); //This line reads the file specified by the user and stores its content in the content variable.
 
     //?
-    let content = std::fs::read_to_string("../test.txt")?;
-    
+    // let content = std::fs::read_to_string("../test.txt")?;
+
+    //Custome Error  :
+    let content = std::fs::read_to_string(&args.path).map_err(|err| {   //This line reads the file specified by the user and stores its content in the content variable.
+        CustomError(format!(                                            //This line creates a new instance of the CustomError struct and returns it.
+            "Could not read file `{}`: {}",                             //This line formats the error message.
+            args.path.display(),                                        
+            err
+        ))
+    })?;
+
     println!("Pattern: \n{}\n", args.pattern);
     for line in content.lines() {
         //This line iterates over each line in the file’s content.
