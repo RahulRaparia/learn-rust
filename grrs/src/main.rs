@@ -3,6 +3,7 @@
 use clap::Parser;
 use std::io::Read;
 use std::path::PathBuf;
+use anyhow::{Context, Result};
 
 #[derive(Parser)] //This line derives the Parser trait for the Cli struct
 struct Cli {
@@ -14,7 +15,7 @@ struct Cli {
 #[derive(Debug)]    //This line derives the Debug trait for the CustomError struct.
 struct CustomError(String);     //This line defines a new struct named CustomError.
 
-fn main() -> Result<(), CustomError> {
+fn main() -> Result<()> {
     //This line defines the main function of the program.
     let args = Cli::parse(); //This line creates an instance of the Cli struct and parses command line arguments using the derived implementation of the Parser trait.
                              //unwrap
@@ -24,13 +25,8 @@ fn main() -> Result<(), CustomError> {
     // let content = std::fs::read_to_string("../test.txt")?;
 
     //Custome Error  :
-    let content = std::fs::read_to_string(&args.path).map_err(|err| {   //This line reads the file specified by the user and stores its content in the content variable.
-        CustomError(format!(                                            //This line creates a new instance of the CustomError struct and returns it.
-            "Could not read file `{}`: {}",                             //This line formats the error message.
-            args.path.display(),                                        
-            err
-        ))
-    })?;
+    let content = std::fs::read_to_string(&args.path)
+        .with_context(|| format!("could not read file `{}`", args.path.display()))?;
 
     println!("Pattern: \n{}\n", args.pattern);
     for line in content.lines() {
